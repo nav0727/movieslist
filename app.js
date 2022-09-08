@@ -2,13 +2,9 @@ const express = require("express");
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
 const path = require("path");
-
 const databasePath = path.join(__dirname, "moviesData.db");
-
 const app = express();
-
 app.use(express.json());
-
 let database = null;
 
 const initializeDbAndServer = async () => {
@@ -28,6 +24,10 @@ const initializeDbAndServer = async () => {
 
 initializeDbAndServer();
 
+
+//conver movie db obj to resp obj
+
+
 const convertMovieDbObjectToResponseObject = (dbObject) => {
   return {
     movieId: dbObject.movie_id,
@@ -37,12 +37,17 @@ const convertMovieDbObjectToResponseObject = (dbObject) => {
   };
 };
 
+
+//convert director db obj to resp obj
+
 const convertDirectorDbObjectToResponseObject = (dbObject) => {
   return {
     directorId: dbObject.director_id,
     directorName: dbObject.director_name,
   };
 };
+
+//get all movies API
 
 app.get("/movies/", async (request, response) => {
   const getMoviesQuery = `
@@ -55,6 +60,8 @@ app.get("/movies/", async (request, response) => {
     moviesArray.map((eachMovie) => ({ movieName: eachMovie.movie_name }))
   );
 });
+
+//get single movie Id API
 
 app.get("/movies/:movieId/", async (request, response) => {
   const { movieId } = request.params;
@@ -69,6 +76,9 @@ app.get("/movies/:movieId/", async (request, response) => {
   response.send(convertMovieDbObjectToResponseObject(movie));
 });
 
+
+//create movie API
+
 app.post("/movies/", async (request, response) => {
   const { directorId, movieName, leadActor } = request.body;
   const postMovieQuery = `
@@ -79,6 +89,8 @@ app.post("/movies/", async (request, response) => {
   await database.run(postMovieQuery);
   response.send("Movie Successfully Added");
 });
+
+//update movie API
 
 app.put("/movies/:movieId/", async (request, response) => {
   const { directorId, movieName, leadActor } = request.body;
@@ -97,6 +109,8 @@ app.put("/movies/:movieId/", async (request, response) => {
   response.send("Movie Details Updated");
 });
 
+//delete movie by ID API
+
 app.delete("/movies/:movieId/", async (request, response) => {
   const { movieId } = request.params;
   const deleteMovieQuery = `
@@ -107,6 +121,8 @@ app.delete("/movies/:movieId/", async (request, response) => {
   await database.run(deleteMovieQuery);
   response.send("Movie Removed");
 });
+
+//get all DIRectors list API
 
 app.get("/directors/", async (request, response) => {
   const getDirectorsQuery = `
@@ -121,6 +137,8 @@ app.get("/directors/", async (request, response) => {
     )
   );
 });
+
+//get director movies API
 
 app.get("/directors/:directorId/movies/", async (request, response) => {
   const { directorId } = request.params;
